@@ -1,39 +1,20 @@
 ---
 title: Retrieval-Augmented Generation Basics
 date: 2026-10-21
-tags: rag, embeddings, retrieval
 ---
 
-Retrieval-augmented generation (RAG) answers questions by first **finding relevant text** from your own data, then giving that text to the model along with the question. The model can then answer from sources it was never trained on, and you can show where the answer came from.
+RAG stands for Retrieval-Augmented Generation. It’s a technique that makes a language model’s answers more accurate by letting it look up relevant information before responding, instead of relying only on what it learned during training.
 
-## The pipeline
+### How it works
 
-1. **Ingest**: split documents into chunks.
-2. **Embed**: turn each chunk into a vector with an embedding model.
-3. **Store**: save the vectors and the original text in a vector index.
-4. **Retrieve**: embed the question and find the nearest chunks.
-5. **Generate**: put those chunks in the prompt and ask the model to answer from them.
+1. **Index:** Your documents (PDFs, web pages, a knowledge base) are split into chunks and converted into embeddings, which are numerical representations of meaning. These are stored in a vector database.
 
-```python
-def answer(question: str) -> str:
-    q_vec = embed(question)
-    chunks = index.search(q_vec, top_k=5)
-    context = "\n\n".join(c.text for c in chunks)
-    prompt = (
-        "Answer using only the context below. "
-        "If the answer isn't there, say you don't know.\n\n"
-        f"Context:\n{context}\n\nQuestion: {question}"
-    )
-    return llm(prompt)
-```
+![alt text](Images/image.png)
 
-## Where RAG usually goes wrong
+2. **Retrieve:** When a user asks a question, the question is also converted into an embedding, and the system finds the chunks most similar in meaning.
 
-- **Bad chunking.** Chunks that cut a thought in half, or are too large to be specific, hurt retrieval.
-- **Retrieval misses.** If the right chunk isn't retrieved, the model can't use it. Evaluate retrieval separately from generation.
-- **Stale data.** Plan how the index is refreshed when sources change.
-- **No grounding instruction.** Tell the model to answer from the context and to admit when it can't.
+![alt text](Images/image1.png)
 
-## Improving it
+3. **Augment:** Those retrieved chunks are added to the prompt alongside the question.
 
-Combine keyword and vector search, rerank the top results, keep chunk metadata such as title and section, and build a small set of real questions with known answers so you can measure each change.
+4. **Generate:** The model writes an answer grounded in that supplied text, often citing the sources.
