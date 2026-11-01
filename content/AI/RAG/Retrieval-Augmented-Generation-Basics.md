@@ -17,4 +17,8 @@ RAG stands for Retrieval-Augmented Generation. It’s a technique that makes a l
 
 3. **Augment:** Those retrieved chunks are added to the prompt alongside the question.
 
+![alt text](Images/image2.png)
+
 4. **Generate:** The model writes an answer grounded in that supplied text, often citing the sources.
+
+![alt text](Images/image3.png)
